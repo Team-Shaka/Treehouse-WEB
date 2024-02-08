@@ -1,12 +1,19 @@
-// App.jsx
-
+import { Route, Routes } from "react-router-dom";
 import TreeBranchView from "./pages/TreeBranchView";
+import MemberBranchView from "./pages/MemberBranchView";
 
 function App() {
     return (
-        <div>
-            <TreeBranchView />
-        </div>
+        <Routes>
+            <Route
+                path="/branchView/tree/:treeId"
+                element={<TreeBranchView />}
+            />
+            <Route
+                path="/branchView/member/:memberId"
+                element={<MemberBranchView />}
+            />
+        </Routes>
     );
 }
 

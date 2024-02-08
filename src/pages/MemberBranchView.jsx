@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import graphData from "./treeData";
+import graphData from "./memberData";
 
-const TreeBranchView = () => {
+const MemberBranchView = () => {
     const svgRef = useRef();
     const [dimensions, setDimensions] = useState({
         width: window.innerWidth,
@@ -74,6 +74,7 @@ const TreeBranchView = () => {
             .attr("r", 25)
             .attr("cx", 0)
             .attr("cy", 0);
+
         const simulation = d3
             .forceSimulation(graphData.nodes)
             .alphaDecay(0.05) // alpha 값이 줄어드는 속도
@@ -82,14 +83,30 @@ const TreeBranchView = () => {
                 d3
                     .forceLink(graphData.links)
                     .id((d) => d.id)
-                    .distance(20) // 노드 간의 거리
+                    .distance((link) => {
+                        const sourceGroup =
+                            typeof link.source === "object"
+                                ? link.source.group
+                                : graphData.nodes.find(
+                                      (node) => node.id === link.source
+                                  ).group;
+                        const targetGroup =
+                            typeof link.target === "object"
+                                ? link.target.group
+                                : graphData.nodes.find(
+                                      (node) => node.id === link.target
+                                  ).group;
+                        return sourceGroup === targetGroup ? 10 : 20; // 같은 그룹이면 50, 다르면 100
+                    })
             )
             .force("charge", d3.forceManyBody().strength(-30)) // 노드 간의 전하
             .force(
                 "center",
                 d3.forceCenter(dimensions.width / 2, dimensions.height / 2)
             )
-            .force("collide", d3.forceCollide(70));
+            .force("collide", d3.forceCollide(70))
+            .force("x", d3.forceX(dimensions.height / 2).strength(0.7));
+
         simulation.on("end", () => {
             const xValues = graphData.nodes.map((node) => node.x);
             const yValues = graphData.nodes.map((node) => node.y);
@@ -205,10 +222,49 @@ const TreeBranchView = () => {
                 }
             });
 
-        node.append("circle")
+        // 일반 노드를 위한 원 추가
+        node.filter((d) => d.id !== "startLabel" && d.id !== "endLabel")
+            .append("circle")
             .attr("r", 25)
             .style("fill", (d) => `url(#pattern-${d.id})`)
             .attr("clip-path", (d) => `url(#clip-${d.id})`);
+
+        // 특정 노드(startLabel, endLabel)를 위한 사각형 추가
+        node.filter((d) => d.id === "startLabel" || d.id === "endLabel")
+            .append("rect")
+            .attr("width", (d) => (d.id === "startLabel" ? 60 : 120)) // 조건에 따른 가로 길이 설정
+            .attr("height", 30)
+            .attr("x", -30)
+            .attr("y", -15)
+            .attr("rx", 15)
+            .attr("ry", 15)
+            .style("fill", "green");
+
+        // 특정 노드에 텍스트 추가
+        node.each(function (d) {
+            if (d.id === "startLabel" || d.id === "endLabel") {
+                d3.select(this)
+                    .append("text")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("dx", d.id === "startLabel" ? "0em" : "2.5em")
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "middle")
+                    .style("fill", "white")
+                    .text(function (d) {
+                        if (d.id === "startLabel") return "YOU";
+                        if (d.id === "endLabel") {
+                            const endLabelNode = graphData.nodes.find(
+                                (node) => node.id === "endLabel"
+                            );
+                            return endLabelNode
+                                ? endLabelNode.name
+                                : "TargetMemberID";
+                        }
+                    })
+                    .style("font-size", "12px");
+            }
+        });
 
         simulation.on("tick", () => {
             link.attr("x1", (d) => d.source.x)
@@ -250,4 +306,4 @@ const TreeBranchView = () => {
     return <svg ref={svgRef} style={{ width: "100%", height: "100vh" }}></svg>;
 };
 
-export default TreeBranchView;
+export default MemberBranchView;
