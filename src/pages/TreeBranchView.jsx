@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import graphData from "./treeData";
+import graphData from "../data/treeData";
 
 const TreeBranchView = () => {
     const svgRef = useRef();
@@ -10,12 +10,18 @@ const TreeBranchView = () => {
     });
     const lastClickedNodeRef = useRef(null);
 
-    // SVG 렌더링 로직
+    useEffect(() => {
+        const handleLoad = () => {
+            renderSvg();
+        };
+
+        window.addEventListener("load", handleLoad);
+        return () => window.removeEventListener("load", handleLoad);
+    }, []);
+
     const renderSvg = () => {
-        // SVG 요소 초기화
         d3.select(svgRef.current).selectAll("*").remove();
 
-        // SVG 요소 생성
         const svg = d3
             .select(svgRef.current)
             .attr("width", dimensions.width)
@@ -256,7 +262,7 @@ const TreeBranchView = () => {
         <svg
             viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
             ref={svgRef}
-            style={{ width: "100%", height: "100vh" }}
+            style={{ width: "100vw", height: "100vh" }}
         ></svg>
     );
 };

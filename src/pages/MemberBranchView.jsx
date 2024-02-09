@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import graphData from "./memberData";
+import graphData from "../data/memberData";
 
 const MemberBranchView = () => {
     const svgRef = useRef();
@@ -8,8 +8,18 @@ const MemberBranchView = () => {
         width: window.innerWidth,
         height: window.innerHeight,
     });
+
     // 이전에 클릭한 노드를 추적
     const lastClickedNodeRef = useRef(null);
+
+    useEffect(() => {
+        const handleLoad = () => {
+            renderSvg();
+        };
+
+        window.addEventListener("load", handleLoad);
+        return () => window.removeEventListener("load", handleLoad);
+    }, []);
 
     const renderSvg = () => {
         if (!svgRef.current) return;
@@ -305,7 +315,7 @@ const MemberBranchView = () => {
         <svg
             viewBox={`0 0 ${dimensions.width} ${dimensions.height}`} // 동적으로 viewBox 설정
             ref={svgRef}
-            style={{ width: "100%", height: "100vh" }}
+            style={{ width: "100vw", height: "100vh" }}
         ></svg>
     );
 };
