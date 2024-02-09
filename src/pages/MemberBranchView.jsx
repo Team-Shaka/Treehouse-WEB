@@ -11,25 +11,7 @@ const MemberBranchView = () => {
     // 이전에 클릭한 노드를 추적
     const lastClickedNodeRef = useRef(null);
 
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-
-        const handleResize = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            });
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-            document.body.style.overflow = "";
-        };
-    }, []);
-
-    useEffect(() => {
+    const renderSvg = () => {
         d3.select(svgRef.current).selectAll("*").remove();
 
         const svg = d3
@@ -301,7 +283,21 @@ const MemberBranchView = () => {
         }
 
         node.call(drag(simulation));
-    }, [dimensions]);
+    };
+
+    useEffect(() => {
+        renderSvg();
+        document.body.style.overflow = "hidden";
+
+        const handleResize = () => {
+            setDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [dimensions.width, dimensions.height]);
 
     return <svg ref={svgRef} style={{ width: "100%", height: "100vh" }}></svg>;
 };

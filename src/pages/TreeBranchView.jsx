@@ -8,30 +8,14 @@ const TreeBranchView = () => {
         width: window.innerWidth,
         height: window.innerHeight,
     });
-    // 이전에 클릭한 노드를 추적
     const lastClickedNodeRef = useRef(null);
 
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-
-        const handleResize = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            });
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-            document.body.style.overflow = "";
-        };
-    }, []);
-
-    useEffect(() => {
+    // SVG 렌더링 로직
+    const renderSvg = () => {
+        // SVG 요소 초기화
         d3.select(svgRef.current).selectAll("*").remove();
 
+        // SVG 요소 생성
         const svg = d3
             .select(svgRef.current)
             .attr("width", dimensions.width)
@@ -74,6 +58,7 @@ const TreeBranchView = () => {
             .attr("r", 25)
             .attr("cx", 0)
             .attr("cy", 0);
+
         const simulation = d3
             .forceSimulation(graphData.nodes)
             .alphaDecay(0.05) // alpha 값이 줄어드는 속도
@@ -90,6 +75,7 @@ const TreeBranchView = () => {
                 d3.forceCenter(dimensions.width / 2, dimensions.height / 2)
             )
             .force("collide", d3.forceCollide(70));
+
         simulation.on("end", () => {
             const xValues = graphData.nodes.map((node) => node.x);
             const yValues = graphData.nodes.map((node) => node.y);
@@ -245,7 +231,26 @@ const TreeBranchView = () => {
         }
 
         node.call(drag(simulation));
-    }, [dimensions]);
+    };
+
+    useEffect(() => {
+        renderSvg(); // 컴포넌트 마운트 및 창 크기가 변경될 때 SVG 다시 렌더링
+
+        const handleResize = () => {
+            setDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+
+        window.addEventListener("resize", handleResize);
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+            document.body.style.overflow = "";
+        };
+    }, [dimensions.width, dimensions.height]);
 
     return <svg ref={svgRef} style={{ width: "100%", height: "100vh" }}></svg>;
 };
