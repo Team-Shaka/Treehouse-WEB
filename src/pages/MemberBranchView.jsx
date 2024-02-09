@@ -12,6 +12,8 @@ const MemberBranchView = () => {
     const lastClickedNodeRef = useRef(null);
 
     const renderSvg = () => {
+        if (!svgRef.current) return;
+
         d3.select(svgRef.current).selectAll("*").remove();
 
         const svg = d3
@@ -299,7 +301,13 @@ const MemberBranchView = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, [dimensions.width, dimensions.height]);
 
-    return <svg ref={svgRef} style={{ width: "100%", height: "100vh" }}></svg>;
+    return (
+        <svg
+            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`} // 동적으로 viewBox 설정
+            ref={svgRef}
+            style={{ width: "100%", height: "100vh" }}
+        ></svg>
+    );
 };
 
 export default MemberBranchView;

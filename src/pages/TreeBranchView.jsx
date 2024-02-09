@@ -252,7 +252,13 @@ const TreeBranchView = () => {
         };
     }, [dimensions.width, dimensions.height]);
 
-    return <svg ref={svgRef} style={{ width: "100%", height: "100vh" }}></svg>;
+    return (
+        <svg
+            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+            ref={svgRef}
+            style={{ width: "100%", height: "100vh" }}
+        ></svg>
+    );
 };
 
 export default TreeBranchView;
