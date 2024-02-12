@@ -16,16 +16,16 @@ const createSvg = (svgRef, dimensions) => {
         .attr("height", dimensions.height);
     const container = svg.append("g");
 
-    svg.call(
-        d3
-            .zoom()
-            .scaleExtent([0.5, 1.5]) // 확대/축소 비율
-            .on("zoom", (event) => {
-                container.attr("transform", event.transform);
-            })
-    );
+    const zoom = d3
+        .zoom()
+        .scaleExtent([1.0, 1.0]) // 확대/축소 비율
+        .on("zoom", (event) => {
+            container.attr("transform", event.transform);
+        });
 
-    return { svg, container };
+    svg.call(zoom);
+
+    return { svg, container, zoom };
 };
 
 const createSimulation = (graphData, dimensions) => {
@@ -39,7 +39,7 @@ const createSimulation = (graphData, dimensions) => {
                 .id((d) => d.id)
                 .distance(20) // 노드 간의 거리
         )
-        .force("charge", d3.forceManyBody().strength(-30)) // 노드 간의 전하
+        .force("charge", d3.forceManyBody().strength(50)) // 노드 간의 전하
         .force(
             "center",
             d3.forceCenter(dimensions.width / 2, dimensions.height / 2)
@@ -92,7 +92,15 @@ const createClipPath = (svg, graphData) => {
         .attr("cy", 0);
 };
 
-const createNode = (container, graphData, lastClickedNodeRef, bfs, svg) => {
+const createNode = (
+    container,
+    graphData,
+    lastClickedNodeRef,
+    bfs,
+    svg,
+    dimensions,
+    zoom
+) => {
     const node = container
         .selectAll(".node")
         .data(graphData.nodes)
@@ -100,39 +108,32 @@ const createNode = (container, graphData, lastClickedNodeRef, bfs, svg) => {
         .append("g")
         .attr("class", "node")
         .on("click", (event, d) => {
+            const scale = d3.zoomTransform(svg.node()).k;
+            const x = -d.x * scale + dimensions.width / 2;
+            const y = -d.y * scale + dimensions.height / 2;
+            // 클릭한 노드가 이전에 클릭한 노드와 같은 경우
             if (d === lastClickedNodeRef.current) {
-                node.select("circle").transition().duration(300).attr("r", 25);
-                svg.selectAll(`clipPath circle`)
+                // 모든 노드의 크기를 초기화
+                container
+                    .selectAll(".node circle")
                     .transition()
                     .duration(300)
                     .attr("r", 25);
 
                 lastClickedNodeRef.current = null;
             } else {
+                // 클릭한 노드와 인접한 노드들의 크기를 조정
                 const distances = bfs(d);
-
-                node.select("circle")
+                container
+                    .selectAll(".node")
+                    .select("circle")
                     .transition()
                     .duration(500)
                     .attr("r", (nodeData) => {
-                        const distance = distances.get(nodeData);
-                        let radius;
-                        switch (distance) {
-                            case 0:
-                                radius = 90;
-                                break;
-                            case 1:
-                                radius = 70;
-                                break;
-                            case 2:
-                                radius = 50;
-                                break;
-                            case 3:
-                                radius = 30;
-                                break;
-                            default:
-                                radius = 10;
-                                break;
+                        const distance = distances.get(nodeData) ?? Infinity;
+                        let radius = 25; // 기본 크기 설정
+                        if (distance <= 3) {
+                            radius = [50, 40, 25, 25][distance];
                         }
                         svg.select(`#clip-${nodeData.id} circle`)
                             .transition()
@@ -142,6 +143,15 @@ const createNode = (container, graphData, lastClickedNodeRef, bfs, svg) => {
                     });
 
                 lastClickedNodeRef.current = d;
+
+                svg.transition()
+                    .duration(500)
+                    .call(
+                        zoom.transform,
+                        d3.zoomIdentity
+                            .translate(x / scale, y / scale)
+                            .scale(scale)
+                    );
             }
         });
 
@@ -149,6 +159,7 @@ const createNode = (container, graphData, lastClickedNodeRef, bfs, svg) => {
         .attr("r", 25)
         .style("fill", (d) => `url(#pattern-${d.id})`)
         .attr("clip-path", (d) => `url(#clip-${d.id})`);
+
     return node;
 };
 
@@ -221,7 +232,7 @@ const TreeBranchView = () => {
         if (!svgRef.current) return;
         d3.select(svgRef.current).selectAll("*").remove();
 
-        const { svg, container } = createSvg(svgRef, dimensions);
+        const { svg, container, zoom } = createSvg(svgRef, dimensions);
         const simulation = createSimulation(graphData, dimensions);
         const link = createLink(container, graphData);
         createPattern(svg, graphData);
@@ -265,7 +276,9 @@ const TreeBranchView = () => {
             graphData,
             lastClickedNodeRef,
             bfs,
-            svg
+            svg,
+            dimensions,
+            zoom
         );
 
         simulation.on("tick", () => {

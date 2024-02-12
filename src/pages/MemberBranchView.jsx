@@ -19,7 +19,7 @@ const createSvg = (svgRef, dimensions) => {
     svg.call(
         d3
             .zoom()
-            .scaleExtent([0.5, 1.5]) // 확대/축소 비율
+            .scaleExtent([1.0, 1.0]) // 확대/축소 비율
             .on("zoom", (event) => {
                 container.attr("transform", event.transform);
             })
@@ -81,38 +81,29 @@ const createNode = (container, graphData, lastClickedNodeRef, svg, bfs) => {
         .append("g")
         .attr("class", "node")
         .on("click", (event, d) => {
+            // 클릭한 노드가 이전에 클릭한 노드와 같은 경우
             if (d === lastClickedNodeRef.current) {
-                node.select("circle").transition().duration(300).attr("r", 25);
-                svg.selectAll(`clipPath circle`)
+                // 모든 노드의 크기를 초기화
+                container
+                    .selectAll(".node circle")
                     .transition()
                     .duration(300)
                     .attr("r", 25);
+
                 lastClickedNodeRef.current = null;
             } else {
                 const distances = bfs(d);
 
-                node.select("circle")
+                container
+                    .selectAll(".node")
+                    .select("circle")
                     .transition()
                     .duration(500)
                     .attr("r", (nodeData) => {
-                        const distance = distances.get(nodeData);
-                        let radius;
-                        switch (distance) {
-                            case 0:
-                                radius = 90;
-                                break;
-                            case 1:
-                                radius = 70;
-                                break;
-                            case 2:
-                                radius = 50;
-                                break;
-                            case 3:
-                                radius = 30;
-                                break;
-                            default:
-                                radius = 10;
-                                break;
+                        const distance = distances.get(nodeData) ?? Infinity;
+                        let radius = 25; // 기본 크기 설정
+                        if (distance <= 3) {
+                            radius = [50, 40, 25, 25][distance];
                         }
                         svg.select(`#clip-${nodeData.id} circle`)
                             .transition()
