@@ -1,6 +1,149 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import graphData from "../data/treeData";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import.meta.env
+
+
+const TreeBranchView = () => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const { treeId } = useParams()
+    const svgRef = useRef();
+    const [graphData, setGraphData] = useState({ nodes: [], links: [] }); // graphData 상태를 추가
+    const [dimensions, setDimensions] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+    const lastClickedNodeRef = useRef(null);
+
+    useEffect(() => {
+        const fetchGraphData = async () => {
+            try {
+                const response = await axios.get(
+                    `${apiUrl}/trees/${treeId}/branchView/all`
+                );
+                if (response.data.isSuccess) {
+                    const { nodes, links } = response.data.data;
+                    const formattedNodes = nodes.map((node) => ({
+                        ...node,
+                        id: `${node.id}`, 
+                        profileImageURL: node.profileImageUrl, 
+                        name: node.memberName, 
+                    }));
+                    const formattedLinks = links.map((link) => ({
+                        source: `${link.sourceId}`, 
+                        target: `${link.targetId}`, 
+                    }));
+                    setGraphData({
+                        nodes: formattedNodes,
+                        links: formattedLinks,
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch graph data:", error);
+            }
+        };
+
+        fetchGraphData();
+    }, []);
+
+    useEffect(() => {
+        renderSvg(); 
+    }, [graphData]); 
+
+    useEffect(() => {
+        const handleLoad = () => {
+            renderSvg();
+        };
+
+        window.addEventListener("load", handleLoad);
+        return () => window.removeEventListener("load", handleLoad);
+    }, []);
+
+    const renderSvg = () => {
+        if (!svgRef.current) return;
+        d3.select(svgRef.current).selectAll("*").remove();
+
+        const { svg, container, zoom } = createSvg(svgRef, dimensions);
+        const simulation = createSimulation(graphData, dimensions);
+        const link = createLink(container, graphData);
+        createPattern(svg, graphData);
+        createClipPath(svg, graphData);
+
+        adjustViewOnSimulationEnd(simulation, svg, graphData, dimensions);
+
+        const adjacencyList = new Map();
+        graphData.nodes.forEach((node) => adjacencyList.set(node, []));
+        graphData.links.forEach((link) => {
+            adjacencyList.get(link.source).push(link.target);
+            adjacencyList.get(link.target).push(link.source);
+        });
+
+        // 너비 우선 탐색(BFS) 알고리즘 정의
+        function bfs(start) {
+            const distances = new Map(
+                graphData.nodes.map((node) => [node, Infinity])
+            );
+            distances.set(start, 0);
+
+            const queue = [start];
+            while (queue.length > 0) {
+                const node = queue.shift();
+                const distance = distances.get(node);
+
+                adjacencyList.get(node).forEach((neighbor) => {
+                    if (distances.get(neighbor) === Infinity) {
+                        distances.set(neighbor, distance + 1);
+                        queue.push(neighbor);
+                    }
+                });
+            }
+
+            return distances;
+        }
+
+        const node = createNode(
+            container,
+            graphData,
+            lastClickedNodeRef,
+            bfs,
+            svg,
+            dimensions,
+            zoom
+        );
+
+        simulation.on("tick", () => {
+            link.attr("x1", (d) => d.source.x)
+                .attr("y1", (d) => d.source.y)
+                .attr("x2", (d) => d.target.x)
+                .attr("y2", (d) => d.target.y);
+
+            node.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
+        });
+
+        node.call(initailizeDrag(simulation));
+    };
+
+    useEffect(() => {
+        renderSvg(); 
+        document.body.style.overflow = "hidden";
+
+        window.addEventListener("resize", handleResize(setDimensions));
+
+        return () => {
+            window.removeEventListener("resize", handleResize(setDimensions));
+            document.body.style.overflow = "";
+        };
+    }, [dimensions.width, dimensions.height]);
+
+    return (
+        <svg
+            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+            ref={svgRef}
+            style={{ width: "100vw", height: "100vh" }}
+        ></svg>
+    );
+};
 
 const handleResize = (setDimensions) => {
     setDimensions({
@@ -61,7 +204,6 @@ const createLink = (container, graphData) => {
 };
 
 const createPattern = (svg, graphData) => {
-    // 패턴을 위한 defs 정의
     svg.append("defs")
         .selectAll("pattern")
         .data(graphData.nodes)
@@ -79,7 +221,6 @@ const createPattern = (svg, graphData) => {
 };
 
 const createClipPath = (svg, graphData) => {
-    // 클립 패스를 위한 defs 정의
     svg.append("defs")
         .selectAll("clipPath")
         .data(graphData.nodes)
@@ -108,9 +249,6 @@ const createNode = (
         .append("g")
         .attr("class", "node")
         .on("click", (event, d) => {
-            const scale = d3.zoomTransform(svg.node()).k;
-            const x = -d.x * scale + dimensions.width / 2;
-            const y = -d.y * scale + dimensions.height / 2;
             // 클릭한 노드가 이전에 클릭한 노드와 같은 경우
             if (d === lastClickedNodeRef.current) {
                 // 모든 노드의 크기를 초기화
@@ -122,8 +260,8 @@ const createNode = (
 
                 lastClickedNodeRef.current = null;
             } else {
-                // 클릭한 노드와 인접한 노드들의 크기를 조정
                 const distances = bfs(d);
+
                 container
                     .selectAll(".node")
                     .select("circle")
@@ -143,15 +281,6 @@ const createNode = (
                     });
 
                 lastClickedNodeRef.current = d;
-
-                svg.transition()
-                    .duration(500)
-                    .call(
-                        zoom.transform,
-                        d3.zoomIdentity
-                            .translate(x / scale, y / scale)
-                            .scale(scale)
-                    );
             }
         });
 
@@ -209,109 +338,6 @@ const initailizeDrag = (simulation) => {
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended);
-};
-
-const TreeBranchView = () => {
-    const svgRef = useRef();
-    const [dimensions, setDimensions] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
-    const lastClickedNodeRef = useRef(null);
-
-    useEffect(() => {
-        const handleLoad = () => {
-            renderSvg();
-        };
-
-        window.addEventListener("load", handleLoad);
-        return () => window.removeEventListener("load", handleLoad);
-    }, []);
-
-    const renderSvg = () => {
-        if (!svgRef.current) return;
-        d3.select(svgRef.current).selectAll("*").remove();
-
-        const { svg, container, zoom } = createSvg(svgRef, dimensions);
-        const simulation = createSimulation(graphData, dimensions);
-        const link = createLink(container, graphData);
-        createPattern(svg, graphData);
-        createClipPath(svg, graphData);
-
-        adjustViewOnSimulationEnd(simulation, svg, graphData, dimensions);
-
-        // 인접 리스트
-        const adjacencyList = new Map();
-        graphData.nodes.forEach((node) => adjacencyList.set(node, []));
-        graphData.links.forEach((link) => {
-            adjacencyList.get(link.source).push(link.target);
-            adjacencyList.get(link.target).push(link.source);
-        });
-
-        // 너비 우선 탐색(BFS) 알고리즘 정의
-        function bfs(start) {
-            const distances = new Map(
-                graphData.nodes.map((node) => [node, Infinity])
-            );
-            distances.set(start, 0);
-
-            const queue = [start];
-            while (queue.length > 0) {
-                const node = queue.shift();
-                const distance = distances.get(node);
-
-                adjacencyList.get(node).forEach((neighbor) => {
-                    if (distances.get(neighbor) === Infinity) {
-                        distances.set(neighbor, distance + 1);
-                        queue.push(neighbor);
-                    }
-                });
-            }
-
-            return distances;
-        }
-
-        const node = createNode(
-            container,
-            graphData,
-            lastClickedNodeRef,
-            bfs,
-            svg,
-            dimensions,
-            zoom
-        );
-
-        simulation.on("tick", () => {
-            link.attr("x1", (d) => d.source.x)
-                .attr("y1", (d) => d.source.y)
-                .attr("x2", (d) => d.target.x)
-                .attr("y2", (d) => d.target.y);
-
-            node.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
-        });
-
-        node.call(initailizeDrag(simulation));
-    };
-
-    useEffect(() => {
-        renderSvg(); // 컴포넌트 마운트 및 창 크기가 변경될 때 SVG 다시 렌더링
-        document.body.style.overflow = "hidden";
-
-        window.addEventListener("resize", handleResize(setDimensions));
-
-        return () => {
-            window.removeEventListener("resize", handleResize(setDimensions));
-            document.body.style.overflow = "";
-        };
-    }, [dimensions.width, dimensions.height]);
-
-    return (
-        <svg
-            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-            ref={svgRef}
-            style={{ width: "100vw", height: "100vh" }}
-        ></svg>
-    );
 };
 
 export default TreeBranchView;
