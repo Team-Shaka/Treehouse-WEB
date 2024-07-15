@@ -1,4 +1,12 @@
+import { useState } from "react";
+
 export default function LandingPage() {
+  const [isTooltipVisible, setIsTooltipVisible] = useState(true);
+
+  const handleTooltipToggle = () => {
+    setIsTooltipVisible(!isTooltipVisible);
+  };
+
   return (
     <div className="">
       {/* Header */}
@@ -41,11 +49,29 @@ export default function LandingPage() {
               <br /> 가능하고, 가입한 사람의 초대장을 통해서만
               <br /> 가입할 수 있어요.
             </div>
-            <div className="flex mt-7 md:mt-20">
+            <div className="flex mt-7 md:mt-20 relative">
               <div className="text-mobile-caption2 font-mobile-caption2 md:text-web-caption1 md:font-web-caption1 opacity-50">
                 *초대장을 어떻게 받을 수 있나요?
               </div>
-              <img src="/assets/icon_tooltip.svg" className="w-5 md:w-6" />
+              <img
+                src="/assets/icon_tooltip.svg"
+                className="w-5 md:w-6 cursor-pointer"
+                alt="tooltip"
+                onClick={handleTooltipToggle}
+              />
+              {isTooltipVisible && (
+                <div
+                  className="flex items-start justify-between absolute left-0 top-5 md:top-8 bg-cover bg-no-repeat bg-center shadow-xl text-[9.75px] md:text-[16px] text-tree_pale w-[170px] md:w-[290px] h-[53px] md:h-[90px] pt-4 px-2 md:pt-7 md:px-4"
+                  style={{ backgroundImage: "url(/assets/tooltip_box.svg)" }}
+                >
+                  <span>
+                    {" "}
+                    게시글, 댓글 작성 등<br /> 활발한 활동을 하면 그래프가
+                    늘어나요!
+                  </span>
+                  <button onClick={handleTooltipToggle}>X</button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -8,6 +8,8 @@ export default {
       },
       colors: {
         tree_green: "#1AA873",
+        tree_darkgreen: "#16705A",
+        tree_pale: "#ECF6F2",
         gray: {
           1: "#F4F4F4",
           2: "#EDEDED",
