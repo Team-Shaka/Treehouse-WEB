@@ -186,11 +186,17 @@ export default function LandingPage() {
         />
 
         <button className="rounded-full bg-tree_green w-52 h-14 md:w-96 md:h-24 text-gray-white text-[18px] md:text-[34px] mt-7 md:mt-10">
-          사전 예약하러 가기
-          <img
-            src="/assets/right-arrow.svg"
-            className="inline ml-2 md:ml-4 h-4 md:h-8"
-          />
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSf89xhYWkCM_9ILCV3RzB9YO94nZHZwHBg6EnIGUeyR7CBMiw/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            사전 예약하러 가기
+            <img
+              src="/assets/right-arrow.svg"
+              className="inline ml-2 md:ml-4 h-4 md:h-8"
+            />
+          </a>
         </button>
       </section>
       <div className="font-mobile-body5 text-mobile-body5 md:font-web-body1 md:text-web-body1 text-gray-4 flex justify-center py-12 md:py-36">
