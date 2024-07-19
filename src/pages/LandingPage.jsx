@@ -199,8 +199,20 @@ export default function LandingPage() {
           </a>
         </button>
       </section>
-      <div className="font-mobile-body5 text-mobile-body5 md:font-web-body1 md:text-web-body1 text-gray-4 flex justify-center py-12 md:py-36">
+      <div className="font-mobile-body5 text-mobile-body5 md:font-web-body1 md:text-web-body1 text-gray-4 flex justify-center py-20 md:py-36">
         Be Root, Be Connected, Treehouse
+      </div>
+      {/* Floating Button */}
+      <div className="fixed left-1/2 transform -translate-x-1/2 w-11/12 bottom-5 md:bottom-10 z-50 cursor-pointer">
+        <button className="rounded-xl bg-tree_green w-full px-6 h-14 md:h-16 text-gray-white text-mobile-body3 md:text-web-body1 drop-shadow-xl">
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSf89xhYWkCM_9ILCV3RzB9YO94nZHZwHBg6EnIGUeyR7CBMiw/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Treehouse 사전 예약하러 가기
+          </a>
+        </button>
       </div>
     </div>
   );
