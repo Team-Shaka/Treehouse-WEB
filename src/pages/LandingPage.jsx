@@ -25,20 +25,32 @@ export default function LandingPage() {
           className="w-[1480px] hidden md:flex"
           alt="landing_1"
         />
-        <img
-          src="/assets/landing_1_mobile.svg"
+        <object
+          data="/assets/landing_1_mobile.svg"
+          type="image/svg+xml"
           className="w-[375px] md:hidden"
-          alt="landing_1_mobile"
-        />
+        >
+          <img
+            src="/assets/landing_1_mobile.svg"
+            alt="landing_1_mobile"
+            className="w-[375px]"
+          />
+        </object>
       </section>
       {/* Section 2 */}
       <section className="py-20 md:py-[280px]">
-        <div className="flex justify-center">
-          <img
-            src="/assets/landing_2.svg"
-            className="w-[128px] mr-5 md:w-[280px] md:mr-[100px]"
-            alt="landing_2"
-          />
+        <div className="flex justify-center items-start">
+          <object
+            data="/assets/landing_2.svg"
+            type="image/svg+xml"
+            className="w-[128px] mr-5 md:w-[280px] md:mr-[100px] block"
+          >
+            <img
+              src="/assets/landing_2.svg"
+              className="w-[128px] mr-5 md:w-[280px] md:mr-[100px]"
+              alt="landing_2"
+            />
+          </object>
           <div className="flex flex-col pt-8">
             <div className="font-mobile-head1 text-mobile-head1 md:font-web-head1 md:text-web-head1">
               나와 너<span className="text-tree_green">, </span> 우리끼리
@@ -89,11 +101,17 @@ export default function LandingPage() {
           className="hidden md:w-[1480px] md:mt-32 md:flex"
           alt="landing_3"
         />
-        <img
-          src="/assets/landing_3_mobile.svg"
+        <object
+          data="/assets/landing_3_mobile.svg"
+          type="image/svg+xml"
           className="w-[375px] md:hidden"
-          alt="landing_3_mobile"
-        />
+        >
+          <img
+            src="/assets/landing_3_mobile.svg"
+            className="w-[375px]"
+            alt="landing_3_mobile"
+          />
+        </object>
       </section>
       {/* Section 4 */}
       <section className="py-14 md:py-[280px] ">
@@ -114,11 +132,17 @@ export default function LandingPage() {
               관계인지 확인할 수 있어요.
             </div>
           </div>{" "}
-          <img
-            src="/assets/landing_4.svg"
-            className="w-[128px] md:w-[280px]"
-            alt="landing_4"
-          />
+          <object
+            data="/assets/landing_4.svg"
+            type="image/svg+xml"
+            className="w-[128px] md:w-[280px] block"
+          >
+            <img
+              src="/assets/landing_4.svg"
+              className="w-[128px] md:w-[280px]"
+              alt="landing_4"
+            />
+          </object>
         </div>
       </section>
       {/* Section 5 */}
@@ -140,18 +164,28 @@ export default function LandingPage() {
           </div>
         </div>
         {/* Mobile */}
-        <div
-          className="flex h-[410px] md:hidden justify-center bg-no-repeat bg-center"
-          style={{ backgroundImage: "url(/assets/landing_5_mobile.svg)" }}
-        >
-          <div className="flex flex-col items-center text-gray-white mt-10">
-            <div className="font-mobile-head1 text-mobile-head1">
-              글과 사진만으로는 부족하니까
-            </div>
-            <div className="font-mobile-caption1 text-mobile-caption1 text-center opacity-80 mt-2">
-              Treehole에 모여 직접 이야기를 나누세요. <br />
-              우리끼리 모여서 이야기를 나누고, 글을 올리고, 목소리로
-              소통해보세요.
+        <div className="relative md:hidden">
+          <object
+            data="/assets/landing_5_mobile.svg"
+            type="image/svg+xml"
+            className="absolute inset-0 w-full h-[410px] object-cover object-center"
+          >
+            <img
+              src="/assets/landing_5_mobile.svg"
+              alt="background"
+              className="w-full h-[410px] object-cover object-center"
+            />
+          </object>
+          <div className="flex h-[410px] justify-center bg-no-repeat bg-center relative z-10">
+            <div className="flex flex-col items-center text-gray-white mt-10">
+              <div className="font-mobile-head1 text-mobile-head1">
+                글과 사진만으로는 부족하니까
+              </div>
+              <div className="font-mobile-caption1 text-mobile-caption1 text-center opacity-80 mt-2">
+                Treehole에 모여 직접 이야기를 나누세요. <br />
+                우리끼리 모여서 이야기를 나누고, 글을 올리고, 목소리로
+                소통해보세요.
+              </div>
             </div>
           </div>
         </div>
