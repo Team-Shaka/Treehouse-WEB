@@ -15,7 +15,6 @@ import {
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeWithLabels } from "../utils/nodeUtils";
-import { useMetaTag } from "../hooks/useMetaTag";
 const defaultImageUrl = "/public/default_image.png";
 
 const MemberBranchView = () => {
@@ -26,7 +25,6 @@ const MemberBranchView = () => {
   const treeId = queryParams.get("treeId");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
-  useMetaTag("robots", "noindex, nofollow");
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
