@@ -16,6 +16,7 @@ import {
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeBase, resizeNodesOnClick } from "../utils/nodeUtils";
+import { useMetaTag } from "../hooks/useMetaTag";
 const defaultImageUrl = "/public/default_image.png";
 
 const TreeBranchView = () => {
@@ -28,6 +29,7 @@ const TreeBranchView = () => {
     height: window.innerHeight,
   });
   const lastClickedNodeRef = useRef(null);
+  useMetaTag("robots", "noindex, nofollow");
 
   useEffect(() => {
     fetchGraphData(

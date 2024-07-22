@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /$
-Allow: /public/sitemap.xml
-Allow: /public/robots.txt
-Disallow: /
-
-Sitemap: https://www.treehous.me/sitemap.xml
