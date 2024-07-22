@@ -12,7 +12,7 @@ export default function LandingPage() {
       {/* Header */}
       <div className="md:p-12">
         <img
-          src="/assets/treehouse.svg"
+          src="/assets/treehouse_gray.svg"
           className="hidden md:flex  md:w-[136px]"
           alt="treehouse"
         />
