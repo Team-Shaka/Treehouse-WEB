@@ -6,15 +6,16 @@ import fetchGraphData from "../utils/fetchGraphData";
 import memberData from "../exampleData/memberData";
 import {
   adjustViewOnSimulationEnd,
-  bfs,
   createClipPath,
   createLink,
   createPattern,
   createSimulation,
   createSvg,
+  handleResize,
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeWithLabels } from "../utils/nodeUtils";
+import { useMetaTag } from "../hooks/useMetaTag";
 const defaultImageUrl = "/public/default_image.png";
 
 const MemberBranchView = () => {
@@ -25,6 +26,7 @@ const MemberBranchView = () => {
   const treeId = queryParams.get("treeId");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  useMetaTag("robots", "noindex, nofollow");
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -53,7 +55,7 @@ const MemberBranchView = () => {
 
     d3.select(svgRef.current).selectAll("*").remove();
 
-    const { svg, container, zoom } = createSvg(svgRef, dimensions);
+    const { svg, container } = createSvg(svgRef, dimensions);
     const simulation = createSimulation(graphData, dimensions);
     const link = createLink(container, graphData);
     const node = createNodeWithLabels(
