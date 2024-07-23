@@ -72,16 +72,30 @@ export default function LandingPage() {
                 onClick={handleTooltipToggle}
               />
               {isTooltipVisible && (
-                <div
-                  className="flex items-start justify-between absolute left-0 top-5 md:top-8 bg-cover bg-no-repeat bg-center shadow-xl text-[9.75px] md:text-[16px] text-tree_pale w-[170px] md:w-[290px] h-[53px] md:h-[90px] pt-4 px-2 md:pt-7 md:px-4"
-                  style={{ backgroundImage: "url(/assets/tooltip_box.svg)" }}
-                >
-                  <span>
-                    {" "}
+                <div className="flex items-start justify-between absolute left-0 top-5 md:top-8 shadow-xl text-[9.75px] md:text-[16px] text-tree_pale w-[170px] md:w-[290px] h-[53px] md:h-[90px] pt-4 px-2 md:pt-7 md:px-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 293 92"
+                    className="absolute inset-0 w-full h-full"
+                  >
+                    <path
+                      fill="#16705A"
+                      fillRule="evenodd"
+                      d="M260.667 14.4 252.353-.002l-8.314 14.4H12.001c-6.627 0-12 5.373-12 12v52.8c0 6.628 5.373 12 12 12h268.8c6.627 0 12-5.372 12-12V26.4c0-6.627-5.373-12-12-12z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="relative z-10">
                     게시글, 댓글 작성 등<br /> 활발한 활동을 하면 그래프가
                     늘어나요!
                   </span>
-                  <button onClick={handleTooltipToggle}>X</button>
+                  <button
+                    onClick={handleTooltipToggle}
+                    className="relative z-10"
+                  >
+                    X
+                  </button>
                 </div>
               )}
             </div>
@@ -229,10 +243,20 @@ export default function LandingPage() {
             rel="noopener noreferrer"
           >
             사전 예약하러 가기
-            <img
-              src="/assets/right-arrow.svg"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 13 24"
               className="inline ml-2 md:ml-4 h-4 md:h-8"
-            />
+            >
+              <path
+                stroke="#ECF6F2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.667"
+                d="m1.333 21.834 10-10-10-10"
+              />
+            </svg>
           </a>
         </button>
       </section>
@@ -240,17 +264,21 @@ export default function LandingPage() {
         Be Root, Be Connected, Treehouse
       </div>
       {/* Floating Button */}
-      <div className="fixed left-1/2 transform -translate-x-1/2 w-11/12 max-w-[385px] md:w-11/12 md:max-w-[1480px] bottom-5 md:bottom-10 z-50 cursor-pointer">
-        <button className="rounded-xl bg-tree_green w-full px-6 h-14 md:h-16 text-gray-white text-mobile-body3 md:text-web-body1 drop-shadow-xl">
-          <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSf89xhYWkCM_9ILCV3RzB9YO94nZHZwHBg6EnIGUeyR7CBMiw/viewform"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Treehouse 사전 예약하러 가기
-          </a>
-        </button>
-      </div>
+      <FloatingButton />
     </div>
   );
 }
+
+const FloatingButton = () => (
+  <div className="fixed left-1/2 transform -translate-x-1/2 w-11/12 max-w-[385px] md:w-11/12 md:max-w-[1480px] bottom-5 md:bottom-10 z-50 cursor-pointer">
+    <button className="rounded-xl bg-tree_green w-full px-6 h-14 md:h-16 text-gray-white text-mobile-body3 md:text-web-body1 drop-shadow-xl">
+      <a
+        href="https://docs.google.com/forms/d/e/1FAIpQLSf89xhYWkCM_9ILCV3RzB9YO94nZHZwHBg6EnIGUeyR7CBMiw/viewform"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Treehouse 사전 예약하러 가기
+      </a>
+    </button>
+  </div>
+);
