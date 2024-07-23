@@ -28,12 +28,12 @@ export default function LandingPage() {
         <object
           data="/assets/landing_1_mobile.svg"
           type="image/svg+xml"
-          className="w-[385px] md:hidden"
+          className="w-[375px] md:hidden"
         >
           <img
             src="/assets/landing_1_mobile.svg"
             alt="landing_1_mobile"
-            className="w-[385px]"
+            className="w-[375px]"
           />
         </object>
       </section>
