@@ -28,12 +28,12 @@ export default function LandingPage() {
         <object
           data="/assets/landing_1_mobile.svg"
           type="image/svg+xml"
-          className="w-[375px] md:hidden"
+          className="w-full max-w-[385px] md:hidden"
         >
           <img
             src="/assets/landing_1_mobile.svg"
             alt="landing_1_mobile"
-            className="w-[375px]"
+            className="w-full max-w-[385px] md:hidden"
           />
         </object>
       </section>
@@ -150,7 +150,10 @@ export default function LandingPage() {
         {/* Web */}
         <div
           className="hidden md:flex md:h-[1100px] justify-center bg-no-repeat bg-container bg-center"
-          style={{ backgroundImage: "url(/assets/landing_5.svg)" }}
+          style={{
+            backgroundImage: "url(/assets/landing_5.svg)",
+            backgroundSize: "auto 1100px",
+          }}
         >
           <div className="flex flex-col items-center text-gray-white mt-24">
             <div className="font-web-head1 text-web-head1">
@@ -237,7 +240,7 @@ export default function LandingPage() {
         Be Root, Be Connected, Treehouse
       </div>
       {/* Floating Button */}
-      <div className="fixed left-1/2 transform -translate-x-1/2 w-11/12 bottom-5 md:bottom-10 z-50 cursor-pointer">
+      <div className="fixed left-1/2 transform -translate-x-1/2 w-11/12 max-w-[385px] md:w-11/12 md:max-w-[1480px] bottom-5 md:bottom-10 z-50 cursor-pointer">
         <button className="rounded-xl bg-tree_green w-full px-6 h-14 md:h-16 text-gray-white text-mobile-body3 md:text-web-body1 drop-shadow-xl">
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSf89xhYWkCM_9ILCV3RzB9YO94nZHZwHBg6EnIGUeyR7CBMiw/viewform"
