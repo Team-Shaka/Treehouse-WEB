@@ -15,7 +15,7 @@ import {
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeWithLabels } from "../utils/nodeUtils";
-const defaultImageUrl = "/public/default_image.png";
+const defaultImageUrl = "/default_image.png";
 
 const MemberBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -23,6 +23,7 @@ const MemberBranchView = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treeId = queryParams.get("treeId");
+  const token = queryParams.get("token");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
 
@@ -35,6 +36,7 @@ const MemberBranchView = () => {
 
   useEffect(() => {
     fetchGraphData(
+      token,
       apiUrl,
       `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
       memberData,

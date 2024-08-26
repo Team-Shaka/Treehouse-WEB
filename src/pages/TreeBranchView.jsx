@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import.meta.env;
 import treeData from "../exampleData/treeData";
 import fetchGraphData from "../utils/fetchGraphData";
@@ -16,11 +16,14 @@ import {
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeBase, resizeNodesOnClick } from "../utils/nodeUtils";
-const defaultImageUrl = "/public/default_image.png";
+const defaultImageUrl = "/default_image.png";
 
 const TreeBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const { treeId } = useParams();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [dimensions, setDimensions] = useState({
@@ -31,6 +34,7 @@ const TreeBranchView = () => {
 
   useEffect(() => {
     fetchGraphData(
+      token,
       apiUrl,
       `/treehouses/${treeId}/branches/complete`,
       treeData,
