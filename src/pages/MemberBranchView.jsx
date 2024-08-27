@@ -39,14 +39,11 @@ const MemberBranchView = () => {
       console.log("Token received from iOS");
       setToken(receivedToken);
     };
-
-    return () => {
-      delete window.receiveToken;
-    };
   }, []);
 
   useEffect(() => {
     if (token) {
+      console.log("Token received. Fetching data...");
       fetchGraphData(
         apiUrl,
         `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
@@ -54,6 +51,8 @@ const MemberBranchView = () => {
         setGraphData,
         token
       );
+    } else {
+      console.log("Token not received yet");
     }
   }, [apiUrl, treeId, memberId, token]);
 
