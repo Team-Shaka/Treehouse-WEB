@@ -12,11 +12,13 @@ axios.interceptors.response.use((response) => {
 });
 
 let token = null;
-
-window.receiveToken = function (receivedToken) {
-  token = receivedToken;
-  console.log("Token received from iOS");
-};
+let tokenPromise = new Promise((resolve) => {
+  window.receiveToken = function (receivedToken) {
+    token = receivedToken;
+    console.log("Token received from iOS");
+    resolve(token);
+  };
+});
 
 const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
   if (import.meta.env.VITE_USE_MOCK_DATA === "true") {
@@ -38,6 +40,8 @@ const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
   } else {
     // Fetch data from API
     try {
+      await tokenPromise;
+
       if (!token) {
         console.error(
           "Token not set. Please ensure receiveToken is called from iOS."
