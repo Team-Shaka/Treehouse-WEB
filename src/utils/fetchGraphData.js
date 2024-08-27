@@ -75,6 +75,8 @@ const fetchGraphData = async (
       }
     } catch (error) {
       console.error("Failed to fetch graph data:", error);
+      let errorMessage = "데이터를 가져오는 중 오류가 발생했습니다.";
+
       if (error.response) {
         console.log("Error Response Status:", error.response.status);
         console.log(
@@ -85,10 +87,22 @@ const fetchGraphData = async (
           "Error Response Headers:",
           JSON.stringify(error.response.headers, null, 2)
         );
+
         if (error.response.status === 401) {
-          alert("인증 토큰이 유효하지 않습니다. 다시 로그인해 주세요.");
+          errorMessage = "인증 토큰이 유효하지 않습니다. 다시 로그인해 주세요.";
+        } else if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else {
+          errorMessage = `오류 발생: ${error.response.status} ${error.response.statusText}`;
         }
+      } else if (error.request) {
+        errorMessage =
+          "서버로부터 응답을 받지 못했습니다. 네트워크 연결을 확인해 주세요.";
+      } else {
+        errorMessage = `오류 발생: ${error.message}`;
       }
+
+      alert(errorMessage);
     }
   }
 };
