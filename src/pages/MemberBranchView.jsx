@@ -25,6 +25,7 @@ const MemberBranchView = () => {
   const treeId = queryParams.get("treeId");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const [token, setToken] = useState(null);
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -34,14 +35,27 @@ const MemberBranchView = () => {
   const lastClickedNodeRef = useRef(null);
 
   useEffect(() => {
-    fetchGraphData(
-      token,
-      apiUrl,
-      `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
-      memberData,
-      setGraphData
-    );
-  }, [apiUrl, treeId, memberId]);
+    window.receiveToken = function (receivedToken) {
+      console.log("Token received from iOS");
+      setToken(receivedToken);
+    };
+
+    return () => {
+      delete window.receiveToken;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      fetchGraphData(
+        apiUrl,
+        `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
+        memberData,
+        setGraphData,
+        token
+      );
+    }
+  }, [apiUrl, treeId, memberId, token]);
 
   useEffect(() => {
     if (graphData.nodes.length > 0) {

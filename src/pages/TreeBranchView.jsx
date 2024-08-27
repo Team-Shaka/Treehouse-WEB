@@ -28,15 +28,30 @@ const TreeBranchView = () => {
     height: window.innerHeight,
   });
   const lastClickedNodeRef = useRef(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    fetchGraphData(
-      apiUrl,
-      `/treehouses/${treeId}/branches/complete`,
-      treeData,
-      setGraphData
-    );
-  }, [apiUrl, treeId]);
+    window.receiveToken = function (receivedToken) {
+      console.log("Token received from iOS");
+      setToken(receivedToken);
+    };
+
+    return () => {
+      delete window.receiveToken;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      fetchGraphData(
+        apiUrl,
+        `/treehouses/${treeId}/branches/complete`,
+        treeData,
+        setGraphData,
+        token
+      );
+    }
+  }, [apiUrl, treeId, token]);
 
   useEffect(() => {
     if (graphData.nodes.length > 0) {

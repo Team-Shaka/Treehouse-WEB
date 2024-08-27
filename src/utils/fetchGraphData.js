@@ -11,20 +11,13 @@ axios.interceptors.response.use((response) => {
   return response;
 });
 
-let token = null;
-let tokenPromise = new Promise((resolve) => {
-  window.receiveToken = function (receivedToken) {
-    token = receivedToken;
-    console.log("Token received from iOS");
-    resolve(token);
-  };
-});
-
-const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
-  console.log("fetchGraphData called, waiting 2 seconds...");
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  console.log("2 second delay completed, proceeding with fetchGraphData");
-
+const fetchGraphData = async (
+  apiUrl,
+  endpoint,
+  exampleData,
+  setGraphData,
+  token
+) => {
   if (import.meta.env.VITE_USE_MOCK_DATA === "true") {
     // Use example data
     const formattedNodes = exampleData.nodes.map((node) => ({
@@ -44,13 +37,9 @@ const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
   } else {
     // Fetch data from API
     try {
-      console.log("Waiting for token...");
-      await tokenPromise;
-      console.log("Token promise resolved");
-
       if (!token) {
         throw new Error(
-          "Token not set. Please ensure receiveToken is called from iOS."
+          "Token not provided. Please ensure token is passed when calling fetchGraphData."
         );
       }
 
