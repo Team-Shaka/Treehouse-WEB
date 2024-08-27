@@ -21,6 +21,10 @@ let tokenPromise = new Promise((resolve) => {
 });
 
 const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
+  console.log("fetchGraphData called, waiting 2 seconds...");
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  console.log("2 second delay completed, proceeding with fetchGraphData");
+
   if (import.meta.env.VITE_USE_MOCK_DATA === "true") {
     // Use example data
     const formattedNodes = exampleData.nodes.map((node) => ({
@@ -40,15 +44,17 @@ const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
   } else {
     // Fetch data from API
     try {
+      console.log("Waiting for token...");
       await tokenPromise;
+      console.log("Token promise resolved");
 
       if (!token) {
-        console.error(
+        throw new Error(
           "Token not set. Please ensure receiveToken is called from iOS."
         );
-        return;
       }
 
+      console.log("Proceeding with API call");
       const response = await axios.get(apiUrl + endpoint, {
         headers: {
           Authorization: `Bearer ${token}`,
