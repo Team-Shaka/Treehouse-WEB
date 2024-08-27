@@ -85,6 +85,9 @@ const fetchGraphData = async (
           "Error Response Headers:",
           JSON.stringify(error.response.headers, null, 2)
         );
+        if (error.response.status === 401) {
+          alert("인증 토큰이 유효하지 않습니다. 다시 로그인해 주세요.");
+        }
       }
     }
   }
