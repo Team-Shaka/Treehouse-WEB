@@ -11,13 +11,14 @@ axios.interceptors.response.use((response) => {
   return response;
 });
 
-const fetchGraphData = async (
-  token,
-  apiUrl,
-  endpoint,
-  exampleData,
-  setGraphData
-) => {
+let token = null;
+
+window.receiveToken = function (receivedToken) {
+  token = receivedToken;
+  console.log("Token received from iOS");
+};
+
+const fetchGraphData = async (apiUrl, endpoint, exampleData, setGraphData) => {
   if (import.meta.env.VITE_USE_MOCK_DATA === "true") {
     // Use example data
     const formattedNodes = exampleData.nodes.map((node) => ({
@@ -37,6 +38,13 @@ const fetchGraphData = async (
   } else {
     // Fetch data from API
     try {
+      if (!token) {
+        console.error(
+          "Token not set. Please ensure receiveToken is called from iOS."
+        );
+        return;
+      }
+
       const response = await axios.get(apiUrl + endpoint, {
         headers: {
           Authorization: `Bearer ${token}`,

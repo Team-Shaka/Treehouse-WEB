@@ -23,7 +23,6 @@ const MemberBranchView = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treeId = queryParams.get("treeId");
-  const token = queryParams.get("token");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
 

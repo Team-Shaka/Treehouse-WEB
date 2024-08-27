@@ -21,9 +21,6 @@ const defaultImageUrl = "/default_image.png";
 const TreeBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const { treeId } = useParams();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const token = queryParams.get("token");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [dimensions, setDimensions] = useState({
@@ -34,7 +31,6 @@ const TreeBranchView = () => {
 
   useEffect(() => {
     fetchGraphData(
-      token,
       apiUrl,
       `/treehouses/${treeId}/branches/complete`,
       treeData,
