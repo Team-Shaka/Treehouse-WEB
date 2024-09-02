@@ -12,11 +12,11 @@ axios.interceptors.response.use((response) => {
 });
 
 const fetchGraphData = async (
+  token,
   apiUrl,
   endpoint,
   exampleData,
-  setGraphData,
-  token
+  setGraphData
 ) => {
   if (import.meta.env.VITE_USE_MOCK_DATA === "true") {
     // Use example data

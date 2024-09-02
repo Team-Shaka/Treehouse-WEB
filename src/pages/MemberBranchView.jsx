@@ -18,23 +18,15 @@ import { createNodeWithLabels } from "../utils/nodeUtils";
 
 const defaultImageUrl = "/default_image.png";
 
-window.receiveToken = function (receivedToken) {
-  console.log("Token received from iOS");
-  window.tokenReceived = receivedToken;
-  window.dispatchEvent(
-    new CustomEvent("tokenReceived", { detail: receivedToken })
-  );
-};
-
 const MemberBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const { memberId } = useParams();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treeId = queryParams.get("treeId");
+  const token = queryParams.get("token");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
-  const [token, setToken] = useState(window.tokenReceived || null);
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -44,33 +36,14 @@ const MemberBranchView = () => {
   const lastClickedNodeRef = useRef(null);
 
   useEffect(() => {
-    console.log("Setting up token received event listener");
-    const handleTokenReceived = (event) => {
-      console.log("Token received event triggered:", event.detail);
-      setToken(event.detail);
-    };
-
-    window.addEventListener("tokenReceived", handleTokenReceived);
-
-    return () => {
-      console.log("Cleaning up token received event listener");
-      window.removeEventListener("tokenReceived", handleTokenReceived);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      console.log("Token is available. Preparing to fetch data...");
-      fetchGraphData(
-        apiUrl,
-        `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
-        memberData,
-        setGraphData,
-        token
-      );
-    } else {
-      console.log("Waiting for token. Data fetch delayed.");
-    }
+    fetchGraphData(
+      token,
+      apiUrl,
+      `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
+      memberData,
+      setGraphData,
+      token
+    );
   }, [apiUrl, treeId, memberId, token]);
 
   useEffect(() => {
