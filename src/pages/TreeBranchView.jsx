@@ -16,7 +16,16 @@ import {
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeBase, resizeNodesOnClick } from "../utils/nodeUtils";
+
 const defaultImageUrl = "/default_image.png";
+
+window.receiveToken = function (receivedToken) {
+  console.log("Token received from iOS");
+  window.tokenReceived = receivedToken;
+  window.dispatchEvent(
+    new CustomEvent("tokenReceived", { detail: receivedToken })
+  );
+};
 
 const TreeBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -28,18 +37,26 @@ const TreeBranchView = () => {
     height: window.innerHeight,
   });
   const lastClickedNodeRef = useRef(null);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(window.tokenReceived || null);
 
   useEffect(() => {
-    window.receiveToken = function (receivedToken) {
-      console.log("Token received from iOS");
-      setToken(receivedToken);
+    console.log("Setting up token received event listener");
+    const handleTokenReceived = (event) => {
+      console.log("Token received event triggered:", event.detail);
+      setToken(event.detail);
+    };
+
+    window.addEventListener("tokenReceived", handleTokenReceived);
+
+    return () => {
+      console.log("Cleaning up token received event listener");
+      window.removeEventListener("tokenReceived", handleTokenReceived);
     };
   }, []);
 
   useEffect(() => {
     if (token) {
-      console.log("Token received. Fetching data...");
+      console.log("Token is available. Preparing to fetch data...");
       fetchGraphData(
         apiUrl,
         `/treehouses/${treeId}/branches/complete`,
@@ -48,7 +65,7 @@ const TreeBranchView = () => {
         token
       );
     } else {
-      console.log("Token not received yet");
+      console.log("Waiting for token. Data fetch delayed.");
     }
   }, [apiUrl, treeId, token]);
 

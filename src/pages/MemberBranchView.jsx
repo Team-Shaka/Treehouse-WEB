@@ -15,7 +15,16 @@ import {
   initializeDrag,
 } from "../utils/graphUtils";
 import { createNodeWithLabels } from "../utils/nodeUtils";
+
 const defaultImageUrl = "/default_image.png";
+
+window.receiveToken = function (receivedToken) {
+  console.log("Token received from iOS");
+  window.tokenReceived = receivedToken;
+  window.dispatchEvent(
+    new CustomEvent("tokenReceived", { detail: receivedToken })
+  );
+};
 
 const MemberBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -25,7 +34,7 @@ const MemberBranchView = () => {
   const treeId = queryParams.get("treeId");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(window.tokenReceived || null);
 
   const [dimensions, setDimensions] = useState({
     width: window.innerWidth,
@@ -35,15 +44,23 @@ const MemberBranchView = () => {
   const lastClickedNodeRef = useRef(null);
 
   useEffect(() => {
-    window.receiveToken = function (receivedToken) {
-      console.log("Token received from iOS");
-      setToken(receivedToken);
+    console.log("Setting up token received event listener");
+    const handleTokenReceived = (event) => {
+      console.log("Token received event triggered:", event.detail);
+      setToken(event.detail);
+    };
+
+    window.addEventListener("tokenReceived", handleTokenReceived);
+
+    return () => {
+      console.log("Cleaning up token received event listener");
+      window.removeEventListener("tokenReceived", handleTokenReceived);
     };
   }, []);
 
   useEffect(() => {
     if (token) {
-      console.log("Token received. Fetching data...");
+      console.log("Token is available. Preparing to fetch data...");
       fetchGraphData(
         apiUrl,
         `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
@@ -52,7 +69,7 @@ const MemberBranchView = () => {
         token
       );
     } else {
-      console.log("Token not received yet");
+      console.log("Waiting for token. Data fetch delayed.");
     }
   }, [apiUrl, treeId, memberId, token]);
 
