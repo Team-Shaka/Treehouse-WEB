@@ -98,7 +98,7 @@ const MemberBranchView = () => {
     <svg
       viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
       ref={svgRef}
-      style={{ width: "100vw", height: "100vh" }}
+      style={{ width: "100vw", height: "100vh", backgroundColor: "#FDFDFD" }}
     ></svg>
   );
 };
