@@ -20,10 +20,11 @@ const defaultImageUrl = "/default_image.png";
 
 const MemberBranchView = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const { memberId } = useParams();
+  const { treeId } = useParams();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const treeId = queryParams.get("treeId");
+  const sourceMemberId = queryParams.get("sourceMemberId");
+  const targetMemberId = queryParams.get("targetMemberId");
   const token = queryParams.get("token");
   const svgRef = useRef();
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
@@ -39,12 +40,12 @@ const MemberBranchView = () => {
     fetchGraphData(
       token,
       apiUrl,
-      `/treehouses/${treeId}/branches?targetMemberId=${memberId}`,
+      `/treehouses/${treeId}/branches?sourceMemberId=${sourceMemberId}&targetMemberId=${targetMemberId}`,
       memberData,
       setGraphData,
       token
     );
-  }, [apiUrl, treeId, memberId, token]);
+  }, [apiUrl, treeId, token, sourceMemberId, targetMemberId]);
 
   useEffect(() => {
     if (graphData.nodes.length > 0) {

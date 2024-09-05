@@ -25,7 +25,7 @@ function App() {
         }
       />
       <Route
-        path="/branchView/member/:memberId"
+        path="/branchView/member/:treeId"
         element={
           <Suspense fallback={<Loading />}>
             <MemberBranchView />
