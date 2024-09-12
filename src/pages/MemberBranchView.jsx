@@ -5,7 +5,6 @@ import.meta.env;
 import fetchGraphData from "../utils/fetchGraphData";
 import memberData from "../exampleData/memberData";
 import {
-  adjustViewOnSimulationEnd,
   createClipPath,
   createLink,
   createPattern,
@@ -69,8 +68,6 @@ const MemberBranchView = () => {
     );
     createPattern(svg, graphData, defaultImageUrl);
     createClipPath(svg, graphData);
-
-    adjustViewOnSimulationEnd(simulation, svg, graphData, dimensions);
 
     simulation.on("tick", () => {
       link

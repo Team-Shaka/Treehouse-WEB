@@ -5,7 +5,6 @@ import.meta.env;
 import treeData from "../exampleData/treeData";
 import fetchGraphData from "../utils/fetchGraphData";
 import {
-  adjustViewOnSimulationEnd,
   bfs,
   createClipPath,
   createLink,
@@ -70,8 +69,6 @@ const TreeBranchView = () => {
     createPattern(svg, graphData, defaultImageUrl);
     createClipPath(svg, graphData);
 
-    adjustViewOnSimulationEnd(simulation, svg, graphData, dimensions);
-
     const node = createNode(
       container,
       graphData,
@@ -99,7 +96,11 @@ const TreeBranchView = () => {
     <svg
       viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
       ref={svgRef}
-      style={{ width: "100vw", height: "100vh", backgroundColor: "#FDFDFD" }}
+      style={{
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "#FDFDFD",
+      }}
     ></svg>
   );
 };

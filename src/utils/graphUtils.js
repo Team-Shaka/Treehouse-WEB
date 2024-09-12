@@ -16,12 +16,12 @@ export const createSvg = (svgRef, dimensions) => {
 
   const zoom = d3
     .zoom()
-    .scaleExtent([1.0, 1.0])
+    .scaleExtent([1, 1])
     .on("zoom", (event) => {
       container.attr("transform", event.transform);
     });
 
-  svg.call(zoom);
+  svg.call(zoom).on("dblclick.zoom", null);
 
   return { svg, container, zoom };
 };
@@ -138,32 +138,4 @@ export const initializeDrag = (simulation) => {
     .on("start", dragstarted)
     .on("drag", dragged)
     .on("end", dragended);
-};
-
-export const adjustViewOnSimulationEnd = (
-  simulation,
-  svg,
-  graphData,
-  dimensions
-) => {
-  simulation.on("end", () => {
-    const xValues = graphData.nodes.map((node) => node.x);
-    const yValues = graphData.nodes.map((node) => node.y);
-    const [xMin, xMax] = d3.extent(xValues);
-    const [yMin, yMax] = d3.extent(yValues);
-
-    const xRatio = dimensions.width / (xMax - xMin);
-    const yRatio = dimensions.height / (yMax - yMin);
-    const zoomRatio = Math.min(xRatio, yRatio) * 0.9;
-
-    const centerX = (xMax + xMin) / 2;
-    const centerY = (yMax + yMin) / 2;
-
-    const transform = d3.zoomIdentity
-      .translate(dimensions.width / 2, dimensions.height / 2)
-      .scale(zoomRatio)
-      .translate(-centerX, -centerY);
-
-    svg.call(d3.zoom().transform, transform);
-  });
 };
