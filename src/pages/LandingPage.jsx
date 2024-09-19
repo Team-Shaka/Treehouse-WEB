@@ -222,7 +222,7 @@ export default function LandingPage() {
         />
         <div className="font-mobile-head1 text-mobile-text1 md:font-web-head1 md:text-web-head1">
           Treehouse는
-          <span className="text-tree_green"> 8월 중 출시될 예정</span>입니다.
+          <span className="text-tree_green"> 10월 중 출시될 예정</span>입니다.
         </div>
         <div className="font-mobile-caption1 text-mobile-cap md:font-web-body1 md:text-web-body1 text-gray-8 mt-2">
           *iOS만 가능합니다. Android는 추후 추가 개발 예정입니다.
